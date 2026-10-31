@@ -1,0 +1,18 @@
+# Core dependencies
+streamlit>=1.35.0
+pandas>=2.2.0
+openpyxl>=3.1.5
+plotly>=5.18.0  # optional, for future visualizations
+
+# Testing and development
+pytest>=8.3.0
+pytest-xdist>=3.5.0  # optional, for parallel testing
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Excel handling (already included but good to pin)
+xlrd>=2.0.1  # for .xls support
+
+# Optional: for enhanced Excel features
+xlwt>=1.3.0  # for .xls writing (if needed)

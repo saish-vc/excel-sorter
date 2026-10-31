@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "SheetSort Architecture",
+    "quality_profile": "showcase",
+    "viewBox": [1180, 620]
+  },
+  "components": [
+    {"id": "browser", "type": "external", "label": "College staff browser", "sublabel": "Upload, configure, download", "pos": [30, 260], "size": [160, 64]},
+    {"id": "streamlit", "type": "frontend", "label": "Streamlit application", "sublabel": "Session UI and previews", "pos": [250, 260], "size": [170, 64]},
+    {"id": "services", "type": "backend", "label": "Processing services", "sublabel": "Validate, clean, sort, filter, deduplicate", "pos": [490, 260], "size": [210, 64]},
+    {"id": "engine", "type": "backend", "label": "pandas processing engine", "sublabel": "In-memory DataFrame", "pos": [760, 260], "size": [180, 64]},
+    {"id": "database", "type": "database", "label": "SQLite metadata store", "sublabel": "Recipes and audit events", "pos": [760, 420], "size": [180, 64]},
+    {"id": "export", "type": "backend", "label": "Excel export module", "sublabel": "Formatted XLSX and Summary", "pos": [1000, 260], "size": [150, 64]}
+  ],
+  "connections": [
+    {"id": "browser-ui", "from": "browser", "to": "streamlit", "label": "HTTPS / local browser", "variant": "emphasis"},
+    {"id": "ui-services", "from": "streamlit", "to": "services", "label": "selected rules"},
+    {"id": "services-engine", "from": "services", "to": "engine", "label": "transform data"},
+    {"id": "services-db", "from": "services", "to": "database", "label": "recipes and audit", "fromSide": "bottom", "toSide": "top"},
+    {"id": "engine-export", "from": "engine", "to": "export", "label": "processed tables"},
+    {"id": "export-browser", "from": "export", "to": "browser", "label": "download XLSX", "fromSide": "top", "toSide": "top", "route": "orthogonal-v"}
+  ],
+  "cards": [
+    {"dot": "emerald", "title": "Privacy", "items": ["Processing stays in memory", "Original uploads are not retained by the app"]},
+    {"dot": "cyan", "title": "Persistence", "items": ["SQLite stores Recipes and audit metadata", "Exports are generated per request"]}
+  ]
+}
