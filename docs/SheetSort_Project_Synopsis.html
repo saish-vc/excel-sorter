@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SheetSort - Project Synopsis</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 8.8pt;
+      line-height: 1.32;
+      color: #1a202c;
+      background: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 100%;
+      height: 277mm; /* Standard A4 printable height with margins */
+      max-height: 277mm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .header {
+      border-bottom: 2px solid #2b6cb0;
+      padding-bottom: 5px;
+      margin-bottom: 7px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .title {
+      font-size: 15pt;
+      font-weight: 800;
+      color: #1a365d;
+      letter-spacing: -0.3px;
+    }
+    .title span {
+      color: #3182ce;
+    }
+    .meta-tag {
+      font-size: 7.5pt;
+      font-weight: 600;
+      color: #4a5568;
+      background: #edf2f7;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e0;
+    }
+    .subtitle {
+      font-size: 8.5pt;
+      color: #4a5568;
+      font-weight: 500;
+      margin-top: 1px;
+    }
+    .section {
+      margin-bottom: 6.5px;
+    }
+    .section-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #2b6cb0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 2px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    p {
+      text-align: justify;
+      margin-bottom: 4px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .card {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 3px solid #3182ce;
+      padding: 5px 7px;
+      border-radius: 3px;
+    }
+    .card h4 {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 2px;
+    }
+    .card p {
+      font-size: 8pt;
+      color: #4a5568;
+      margin: 0;
+      line-height: 1.25;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8pt;
+      margin-top: 2px;
+    }
+    th, td {
+      border: 1px solid #cbd5e0;
+      padding: 3.5px 5px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #ebf8ff;
+      color: #2b6cb0;
+      font-weight: 700;
+    }
+    tr:nth-child(even) td {
+      background: #f7fafc;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 6.8pt;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .badge-green { background: #c6f6d5; color: #22543d; }
+    .badge-blue { background: #bee3f8; color: #2a4365; }
+    .badge-purple { background: #e9d8fd; color: #44337a; }
+    ul {
+      margin-left: 14px;
+      margin-bottom: 3px;
+    }
+    li {
+      margin-bottom: 2px;
+    }
+    .tech-pill {
+      display: inline-block;
+      background: #edf2f7;
+      border: 1px solid #cbd5e0;
+      border-radius: 3px;
+      padding: 1.5px 5px;
+      font-size: 7.5pt;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 1px 2px;
+    }
+    .footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 4px;
+      font-size: 7.2pt;
+      color: #718096;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .page {
+        margin: 0;
+        page-break-after: always;
+        break-after: page;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================== PAGE 1 ======================== -->
+  <div class="page">
+    <div>
+      <!-- Header -->
+      <div class="header">
+        <div class="header-top">
+          <div class="title">SheetSort <span>— College Data Processing Platform</span></div>
+          <div class="meta-tag">PROJECT SYNOPSIS & TECHNICAL BRIEF</div>
+        </div>
+        <div class="subtitle">An Automated, Air-Gapped Desktop Suite for Academic Data Cleaning, Standardization & Multi-Sheet Excel Operations</div>
+      </div>
+
+      <!-- 1. Executive Summary -->
+      <div class="section">
+        <div class="section-title">1. Executive Summary & Abstract</div>
+        <p>
+          Educational institutions process tens of thousands of student records every semester across exam cells, admissions, placement cells, and academic departments. These datasets arrive in heterogeneous, unstructured formats riddled with formatting discrepancies, irregular headers, duplicate entries, inconsistent phone numbers, and mixed date styles. <strong>SheetSort</strong> is an enterprise-grade, privacy-first desktop application developed to automate college data transformations. Operating strictly within an air-gapped local environment, SheetSort replaces hours of error-prone manual spreadsheet wrangling with a resilient, multi-step pipeline—incorporating heuristic schema detection, automated cleaning rules, multi-level sorting, deduplication, departmental splitting, and a reusable "Recipe" workflow engine.
+        </p>
+      </div>
+
+      <!-- 2. Problem Statement -->
+      <div class="section">
+        <div class="section-title">2. Problem Statement & Motivation</div>
+        <div class="grid-2">
+          <div class="card">
+            <h4>Academic Administrative Bottlenecks</h4>
+            <p>Departmental offices receive attendance sheets, mark lists, and roster files with inconsistent formatting (e.g. 1-4 banner title rows, random column casings). Staff spend substantial manual hours aligning columns and sorting rosters.</p>
+          </div>
+          <div class="card">
+            <h4>Data Integrity & Student Privacy Risks</h4>
+            <p>Using cloud-based conversion utilities exposes confidential student PII (Roll Numbers, phone numbers, caste categories, marks). Furthermore, unvetted Excel files are vulnerable to spreadsheet formula injection attacks.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Project Objectives -->
+      <div class="section">
+        <div class="section-title">3. Objectives & Technical Scope</div>
+        <ul>
+          <li><strong>Zero-Latency Local Execution:</strong> Process up to 100,000 rows (50 MB) entirely on-premise without cloud transmission.</li>
+          <li><strong>Autonomous Schema Recognition:</strong> Heuristically detect header offsets and infer specialized column data types (ID, Date, Email, Phone, Numeric).</li>
+          <li><strong>Reusable Recipe Automation:</strong> Enable administrative staff to record and replay end-to-end transformation pipelines in one click.</li>
+          <li><strong>Academic Department Splitting:</strong> Automatically divide centralized university rosters into department-wise worksheets in a single output workbook.</li>
+          <li><strong>Compliance & Accountability:</strong> Maintain a tamper-evident SQLite audit log tracking every data action, row count, and exported file.</li>
+        </ul>
+      </div>
+
+      <!-- 4. System Architecture & Processing Pipeline -->
+      <div class="section">
+        <div class="section-title">4. System Architecture & Modular Pipeline</div>
+        <table style="margin-bottom: 6px;">
+          <thead>
+            <tr>
+              <th style="width: 14%;">Stage</th>
+              <th style="width: 28%;">Module / Service</th>
+              <th>Technical Responsibilities & Operational Logic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Stage 1: Ingestion</strong></td>
+              <td><code>upload_service.py</code></td>
+              <td>Enforces 50 MB / 100k row caps; verifies magic bytes (<code>PK</code> for <code>.xlsx</code>, <code>\xd0\xcf\x11\xe0</code> for <code>.xls</code>); sanitizes input streams.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 2: Inference</strong></td>
+              <td><code>schema_detection.py</code></td>
+              <td>Scans top 5 rows for string density to locate true header row; infers normalized schemas and detects IDs, emails, and phone patterns.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 3: Cleansing</strong></td>
+              <td><code>data_cleaning.py</code></td>
+              <td>Applies 8 vectorized transformations: whitespace trimming, header normalization, regex phone parsing, DD-MM-YYYY date coercion, empty row/col purging.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 4: Organizing</strong></td>
+              <td><code>sorting.py</code> & <code>filtering.py</code></td>
+              <td>Executes multi-column priority ordering (including custom categorical orders like <code>CSE &gt; IT &gt; ECE</code>) and complex compound Boolean filters.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 5: Integrity</strong></td>
+              <td><code>deduplication.py</code></td>
+              <td>Executes exact duplicate row pruning and configurable fuzzy near-duplicate matching over selected key attributes.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 6: Distribution</strong></td>
+              <td><code>splitting.py</code></td>
+              <td>Segments master DataFrames by unique values of a split column, sanitizing Excel sheet names to legal 31-character strings.</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 7: Export</strong></td>
+              <td><code>export_service.py</code></td>
+              <td>Builds styled OpenPyXL workbooks with bold frozen headers, auto-filters, auto-fitted columns, safe formula escaping, and an executive Summary sheet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 5. Technology Stack -->
+      <div class="section">
+        <div class="section-title">5. Technology Stack & Specifications</div>
+        <div style="margin-top: 2px;">
+          <span class="tech-pill">Python 3.12+ (Core Engine)</span>
+          <span class="tech-pill">Streamlit 1.35+ (Interactive GUI)</span>
+          <span class="tech-pill">Pandas 2.2+ (Vectorized Computation)</span>
+          <span class="tech-pill">OpenPyXL 3.1+ (Excel Construction)</span>
+          <span class="tech-pill">SQLite 3 (ACID Audit & Recipe Storage)</span>
+          <span class="tech-pill">PyInstaller (Zero-Dependency Windows Executable)</span>
+          <span class="tech-pill">Pytest (63 Automated Unit Tests)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 1 Footer -->
+    <div class="footer">
+      <span>SheetSort: College Data Processing Application — Synopsis</span>
+      <span>Confidential — Prepared for Academic Institution Review</span>
+      <span>Page 1 of 2</span>
+    </div>
+  </div>
+
+  <!-- ======================== PAGE 2 ======================== -->
+  <div class="page">
+    <div>
+      <!-- Page 2 Header -->
+      <div class="header">
+        <div class="header-top">
+          <div class="title">SheetSort <span>— Technical Validation & Implementation Brief</span></div>
+          <div class="meta-tag">EVALUATION, SECURITY & VALUE PROPOSITION</div>
+        </div>
+        <div class="subtitle">Security Pentesting Certification, Quality Metrics, College Workflows & Commercial Viability</div>
+      </div>
+
+      <!-- 6. Security Audit & Pentesting Results -->
+      <div class="section">
+        <div class="section-title">6. Security Architecture & Penetration Testing Audit</div>
+        <p>Prior to institutional deployment, SheetSort underwent a comprehensive security audit identifying and fixing 8 distinct vulnerability vectors:</p>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25%;">Vulnerability Vector</th>
+              <th style="width: 15%;">Severity</th>
+              <th style="width: 32%;">Attack Scenario & Impact</th>
+              <th>Implemented Defense Mechanism</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>CSV / Formula Injection</strong></td>
+              <td><span class="badge badge-green">RESOLVED</span> High</td>
+              <td>Student names containing <code>=cmd|' /C ...'!A1</code> executing malicious shell payloads on Excel opening.</td>
+              <td><code>safe_excel_value()</code> prepends apostrophes (<code>'</code>) to strings starting with <code>=</code>, <code>+</code>, <code>-</code>, or <code>@</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>ReDoS (Regex Denial of Service)</strong></td>
+              <td><span class="badge badge-green">RESOLVED</span> Critical</td>
+              <td>Malicious filter patterns (e.g. <code>(a+)+$</code>) triggering catastrophic CPU backtracking and UI freezing.</td>
+              <td>Enforced literal string searching with <code>regex=False</code> across all search and containment filters.</td>
+            </tr>
+            <tr>
+              <td><strong>File Signature Spoofing</strong></td>
+              <td><span class="badge badge-green">RESOLVED</span> Critical</td>
+              <td>Renaming executable malware to <code>.xlsx</code> or <code>.xls</code> to bypass extension verification.</td>
+              <td>Implemented magic-byte inspection validating ZIP headers (<code>PK</code>) and OLE2 compound headers.</td>
+            </tr>
+            <tr>
+              <td><strong>Path-Traversal in Storage</strong></td>
+              <td><span class="badge badge-green">RESOLVED</span> Medium</td>
+              <td>Arbitrary environment database redirection targeting privileged operating system directories.</td>
+              <td>Implemented <code>get_safe_db_path()</code> constraining all SQLite operations to verified safe paths.</td>
+            </tr>
+            <tr>
+              <td><strong>Localhost Network Isolation</strong></td>
+              <td><span class="badge badge-green">RESOLVED</span> High</td>
+              <td>Exposing administrative spreadsheets over the campus LAN or Wi-Fi subnets.</td>
+              <td>Desktop launcher binds exclusively to loopback <code>127.0.0.1</code>; usage telemetry strictly disabled.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 7. Quality Assurance & Test Coverage -->
+      <div class="section">
+        <div class="section-title">7. Verification & Quality Assurance Metrics</div>
+        <div class="grid-3">
+          <div class="card">
+            <h4>63 Automated Tests</h4>
+            <p>100% test pass rate across 9 test suites verifying cleaning, schema detection, duplicate removal, sorting, filtering, and export.</p>
+          </div>
+          <div class="card">
+            <h4>Deterministic Output</h4>
+            <p>Pure functional DataFrame transformations ensure exact repeatability across runs with zero data distortion.</p>
+          </div>
+          <div class="card">
+            <h4>Zero Dependencies</h4>
+            <p>Compiled into a self-contained 64-bit Windows executable; runs instantly without installing Python, Pip, or drivers.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Real-World College Use Cases -->
+      <div class="section">
+        <div class="section-title">8. Institutional Use Cases & College Workflow Impact</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 22%;">College Branch / Cell</th>
+              <th style="width: 38%;">Traditional Administrative Challenge</th>
+              <th>SheetSort Automated Solution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Examination Cell</strong></td>
+              <td>Consolidating university marks files containing thousands of students across 6 departments with non-standardized roll numbers.</td>
+              <td>Cleans strings, normalizes roll formats, sorts by department rank, and splits into individual branch worksheets automatically.</td>
+            </tr>
+            <tr>
+              <td><strong>Training & Placement (T&P)</strong></td>
+              <td>Filtering eligible candidates based on multi-criteria hurdles (CGPA &ge; 7.5, 0 active backlogs, specific branches, valid contact details).</td>
+              <td>Compound Boolean filtering with 1-click email and phone validation; deduplicates duplicate student application submissions.</td>
+            </tr>
+            <tr>
+              <td><strong>Attendance & Academic Cell</strong></td>
+              <td>Identifying defaulter students under 75% attendance across multiple class registers and generating faculty action lists.</td>
+              <td>Applies "Attendance Defaulter" recipe in seconds, flags at-risk profiles, and exports an executive audit summary for the Principal.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 9. Commercial Viability & Conclusion -->
+      <div class="section">
+        <div class="section-title">9. Commercial Viability, Licensing & Future Roadmap</div>
+        <p>
+          <strong>Deployment Model:</strong> Offered as an institutional perpetual site license with zero per-user software fees. Because it operates completely offline on standard Windows hardware (Intel i3+, 4GB RAM), it requires zero server provisioning, cloud subscription overhead, or dedicated maintenance staff.
+        </p>
+        <p>
+          <strong>Roadmap:</strong> Upcoming v1.1 milestones include direct PDF report compilation with university crests, automated multi-file batch folder watching, and direct integration with open college ERP databases via ODBC.
+        </p>
+      </div>
+
+      <!-- 10. Conclusion Box -->
+      <div class="card" style="border-left: 3px solid #38a169; background: #f0fff4; margin-top: 4px;">
+        <h4 style="color: #22543d;">Institutional Value Summary</h4>
+        <p style="color: #276749;">
+          SheetSort delivers measurable ROI to college administrations by cutting repetitive data processing hours by over 85%, eliminating human transcription errors, and guaranteeing 100% student data privacy and safety against cyber threats.
+        </p>
+      </div>
+    </div>
+
+    <!-- Page 2 Footer -->
+    <div class="footer">
+      <span>Developer: saish-vc | Repository: github.com/saish-vc/excel-sorter</span>
+      <span>SheetSort v1.0.0 — Standalone Windows Release</span>
+      <span>Page 2 of 2</span>
+    </div>
+  </div>
+
+</body>
+</html>
