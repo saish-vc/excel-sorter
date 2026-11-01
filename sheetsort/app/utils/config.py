@@ -35,9 +35,32 @@ PREVIEW_ROW_COUNT = 10
 DEFAULT_SORT_ORDER_ASC = "asc"
 DEFAULT_SORT_ORDER_DESC = "desc"
 
-# Logging
+# Logging – never expose file-system structure in log format
 LOG_LEVEL = os.getenv("SHEETSORT_LOG_LEVEL", "INFO")
-LOG_FORMAT = "%Y-%m-%d %H:%M:%S | %(levelname)-8s | %(name)s | %(message)s"
+LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+
+# Restrict the DB path env-var to prevent path-traversal abuse
+_ALLOWED_DB_DIR = Path.home() / "SheetSort"
+
+
+def get_safe_db_path() -> str:
+    """Return a validated recipe database path.
+    
+    If SHEETSORT_RECIPE_DB is set, ensure it resolves inside the
+    user's SheetSort directory or the project root.  Fall back to
+    the default if the path looks suspicious.
+    """
+    env_val = os.getenv("SHEETSORT_RECIPE_DB")
+    if env_val:
+        resolved = Path(env_val).expanduser().resolve()
+        # Allow paths inside the user's SheetSort dir or the project root
+        if (
+            str(resolved).startswith(str(_ALLOWED_DB_DIR))
+            or str(resolved).startswith(str(PROJECT_ROOT))
+        ):
+            return str(resolved)
+    # Default
+    return RECIPE_DB_NAME
 
 
 def is_allowed_file(filename: str) -> bool:

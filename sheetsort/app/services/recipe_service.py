@@ -17,6 +17,10 @@ from sheetsort.app.models.audit_log_entry import create_audit_log_entry
 class RecipeService:
     """Handles recipe storage and retrieval using SQLite."""
     
+    # Maximum allowed recipe name length to prevent abuse
+    MAX_NAME_LENGTH = 200
+    MAX_DESCRIPTION_LENGTH = 2000
+    
     def __init__(self, db_path: str = "recipes.db"):
         self.db_path = db_path
         Path(db_path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
@@ -67,7 +71,15 @@ class RecipeService:
         """Save a new recipe to the database.
         
         Returns the recipe_id.
+        Raises ValueError for invalid input.
         """
+        # Input validation
+        if not name or not name.strip():
+            raise ValueError("Recipe name cannot be empty.")
+        name = name.strip()[:self.MAX_NAME_LENGTH]
+        if description:
+            description = description.strip()[:self.MAX_DESCRIPTION_LENGTH]
+        
         recipe_id = str(uuid.uuid4())
         created_ts = datetime.now().isoformat()
         
@@ -77,7 +89,7 @@ class RecipeService:
         sort_rules_json = json.dumps(sort_rules) if sort_rules else "[]"
         filter_rules_json = json.dumps(filter_rules) if filter_rules else "[]"
         cleaning_rules_json = json.dumps(cleaning_rules) if cleaning_rules else "[]"
-        split_rule_json = json.dumps(split_rule) if split_rule else "None"
+        split_rule_json = json.dumps(split_rule) if split_rule else "null"
         
         cursor.execute(
             """INSERT INTO recipes 
@@ -146,7 +158,7 @@ class RecipeService:
             recipe_dict["cleaning_rules"] = []
         
         try:
-            recipe_dict["split_rule"] = json.loads(recipe_dict["split_rule"]) if recipe_dict["split_rule"] != "None" else None
+            recipe_dict["split_rule"] = json.loads(recipe_dict["split_rule"]) if recipe_dict["split_rule"] and recipe_dict["split_rule"] not in ("None", "null") else None
         except (json.JSONDecodeError, TypeError):
             recipe_dict["split_rule"] = None
         
@@ -345,23 +357,31 @@ class RecipeService:
         entry_id = str(uuid.uuid4())
         timestamp = datetime.datetime.now().isoformat()
         
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        cursor.execute(
-            """INSERT INTO audit_log 
-               (entry_id, user_action, file_id, recipe_id, timestamp, 
-                rows_processed, rows_exported, notes)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                entry_id,
-                user_action,
-                file_id,
-                recipe_id,
-                timestamp,
-                rows_processed,
-                rows_exported,
-                notes,
+        # Sanitize free-text notes to a reasonable length
+        if notes and len(notes) > 1000:
+            notes = notes[:1000]
+        
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute(
+                """INSERT INTO audit_log 
+                   (entry_id, user_action, file_id, recipe_id, timestamp, 
+                    rows_processed, rows_exported, notes)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    entry_id,
+                    user_action,
+                    file_id,
+                    recipe_id,
+                    timestamp,
+                    rows_processed,
+                    rows_exported,
+                    notes,
+                )
             )
-        )
-        conn.commit()
-        conn.close()
+            conn.commit()
+        except sqlite3.Error:
+            pass  # Audit logging should never crash the app
+        finally:
+            conn.close()

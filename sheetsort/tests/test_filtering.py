@@ -130,3 +130,36 @@ class TestFilteringNoRules:
         result, reduced = apply_filters(df, [])
         pd.testing.assert_frame_equal(result, df)
         assert reduced == 0
+
+
+class TestFilteringSecurity:
+    """Security tests for filtering."""
+
+    def test_contains_filter_with_regex_metacharacters(self):
+        """Contains filter should NOT interpret regex metacharacters (ReDoS prevention)."""
+        df = pd.DataFrame({
+            "Name": ["Alice (admin)", "Bob", "Charlie [staff]", "Dave"]
+        })
+        # These characters would be regex metacharacters if regex=True
+        rule = create_filter_rule(
+            column_name="Name",
+            condition="contains",
+            value="(admin)"
+        )
+        result, reduced = apply_filters(df, [rule])
+        assert len(result) == 1
+        assert result["Name"].iloc[0] == "Alice (admin)"
+
+    def test_contains_filter_with_evil_regex_pattern(self):
+        """Ensure malicious regex patterns are treated as literal text."""
+        df = pd.DataFrame({
+            "Data": ["normal text", "a]b[c", "test.*data"]
+        })
+        rule = create_filter_rule(
+            column_name="Data",
+            condition="contains",
+            value=".*"  # Would match everything if treated as regex
+        )
+        result, reduced = apply_filters(df, [rule])
+        # Should only match "test.*data" literally
+        assert len(result) == 1

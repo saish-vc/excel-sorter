@@ -68,9 +68,9 @@ def _build_filter_mask(
     mask = pd.Series(index=series.index, dtype=bool)
     
     if condition == "contains":
-        # Text contains
+        # Text contains – use fixed-string matching (regex=False) to prevent ReDoS
         mask = series.astype(str).str.contains(
-            str(value), case=False, na=False
+            str(value), case=False, na=False, regex=False
         )
     
     elif condition == "exact":

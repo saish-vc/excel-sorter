@@ -9,9 +9,40 @@ from sheetsort.app.utils.config import MAX_UPLOAD_ROWS, MAX_UPLOAD_SIZE_BYTES, i
 from sheetsort.app.models.uploaded_file import create_uploaded_file, UploadedFile
 from sheetsort.app.models.audit_log_entry import create_audit_log_entry
 
+# Magic bytes for known file types
+_XLSX_MAGIC = b"PK"  # ZIP-based Office Open XML
+_XLS_MAGIC = b"\xd0\xcf\x11\xe0"  # OLE2 Compound Document
+# CSV has no magic bytes, but must be valid UTF-8/Latin-1 text
+
+
+def _validate_file_content(filename: str, content_bytes: bytes) -> Tuple[bool, Optional[str]]:
+    """Validate that file content matches the claimed extension (magic-byte check).
+    
+    Prevents attackers from uploading malicious files disguised with an allowed extension.
+    """
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    
+    if ext == "xlsx":
+        if not content_bytes[:2] == _XLSX_MAGIC:
+            return False, "File content does not match .xlsx format. The file may be corrupted or spoofed."
+    elif ext == "xls":
+        if not content_bytes[:4] == _XLS_MAGIC:
+            return False, "File content does not match .xls format. The file may be corrupted or spoofed."
+    elif ext == "csv":
+        # Basic check: CSV must be decodable as text
+        try:
+            content_bytes[:4096].decode("utf-8")
+        except UnicodeDecodeError:
+            try:
+                content_bytes[:4096].decode("latin-1")
+            except UnicodeDecodeError:
+                return False, "File does not appear to be a valid text/CSV file."
+    
+    return True, None
+
 
 def validate_file(filename: str, content_bytes: bytes) -> Tuple[bool, Optional[str]]:
-    """Validate an uploaded file's type and size.
+    """Validate an uploaded file's type, size, and content integrity.
     
     Returns (is_valid, error_message). If valid, error_message is None.
     """
@@ -19,11 +50,18 @@ def validate_file(filename: str, content_bytes: bytes) -> Tuple[bool, Optional[s
         return False, "No filename provided."
     
     if not is_allowed_file(filename):
-        allowed = ", ".join(sorted(get_upload_limit_info().keys() if False else ["xlsx", "xls", "csv"]))
-        return False, f"Unsupported file type. Please upload .xlsx, .xls, or .csv. Allowed: {allowed}"
+        return False, "Unsupported file type. Please upload .xlsx, .xls, or .csv."
     
     if len(content_bytes) > MAX_UPLOAD_SIZE_BYTES:
         return False, f"File too large. Maximum size is 50 MB."
+    
+    if len(content_bytes) == 0:
+        return False, "Uploaded file is empty (0 bytes)."
+    
+    # Magic-byte / content-type validation
+    content_valid, content_error = _validate_file_content(filename, content_bytes)
+    if not content_valid:
+        return False, content_error
     
     return True, None
 
@@ -57,7 +95,7 @@ def read_file_into_dataframe(filename: str, content_bytes: bytes) -> Tuple[Optio
     except pd.errors.EmptyDataError:
         return None, "The uploaded file is empty or contains no data."
     except Exception as e:
-        return None, f"Could not read the file. Error: {str(e)[:100]}"
+        return None, f"Could not read the file. The file may be corrupted or in an unexpected format."
 
 
 def process_upload(

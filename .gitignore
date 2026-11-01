@@ -54,7 +54,8 @@ logs/
 # Streamlit
 .streamlit/
 
-# Temporary files
+# Temporary and archive files
 *.tmp
 *.bak
 *.log
+*.zip

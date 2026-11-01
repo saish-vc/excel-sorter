@@ -32,7 +32,7 @@ from sheetsort.app.services.splitting import split_dataframe_by_column
 from sheetsort.app.services.recipe_service import RecipeService
 from sheetsort.app.services.export_service import export_to_excel, create_summary_dict
 from sheetsort.app.models.audit_log_entry import create_audit_log_entry
-from sheetsort.app.utils.config import ALLOWED_EXTENSIONS, is_allowed_file
+from sheetsort.app.utils.config import ALLOWED_EXTENSIONS, is_allowed_file, get_safe_db_path
 
 
 # Page config
@@ -53,7 +53,7 @@ if "column_metadata" not in st.session_state:
 if "processing_steps" not in st.session_state:
     st.session_state.processing_steps = []
 if "recipe_service" not in st.session_state:
-    db_path = os.getenv("SHEETSORT_RECIPE_DB", "recipes.db")
+    db_path = get_safe_db_path()
     st.session_state.recipe_service = RecipeService(db_path)
 if "current_recipe" not in st.session_state:
     st.session_state.current_recipe = None
@@ -309,7 +309,7 @@ def page_sorting():
         )
         try:
             custom_order_list = [x.strip() for x in custom_order.split(",") if x.strip()] if custom_order else None
-        except:
+        except (ValueError, AttributeError):
             custom_order_list = None
         
         priority = st.number_input("Priority", min_value=0, value=0, key="sort_priority")
@@ -350,7 +350,7 @@ def page_sorting():
                 )
                 try:
                     new_custom_list = [x.strip() for x in new_custom.split(",") if x.strip()] if new_custom else None
-                except:
+                except (ValueError, AttributeError):
                     new_custom_list = None
                 
                 new_priority = st.number_input(
@@ -711,11 +711,10 @@ def page_export_recipes():
             columns_modified=sum(1 for value in cleaning_counts.values() if value),
         )
         
-        # Create temporary output path
-        output_path = os.path.join(
-            tempfile.gettempdir(),
-            f"sheetsort_export_{uuid.uuid4().hex[:8]}.xlsx"
-        )
+        # Create temporary output path (restricted to system temp dir)
+        output_dir = tempfile.gettempdir()
+        safe_filename = f"sheetsort_export_{uuid.uuid4().hex[:8]}.xlsx"
+        output_path = os.path.join(output_dir, safe_filename)
         
         with st.spinner("Exporting to Excel..."):
             output_path, export_info = export_to_excel(
@@ -748,7 +747,7 @@ def page_export_recipes():
         # Clean up temp file
         try:
             os.remove(output_path)
-        except:
+        except OSError:
             pass
         
         # Store summary for audit
@@ -769,20 +768,24 @@ def page_audit_log():
     import sqlite3
     from sheetsort.app.utils.config import AUDIT_LOG_MAX_ENTRIES
     
-    db_path = os.getenv("SHEETSORT_RECIPE_DB", "recipes.db")
+    db_path = get_safe_db_path()
     
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    # Count total entries
-    cursor.execute("SELECT COUNT(*) FROM audit_log")
-    total = cursor.fetchone()[0]
-    
-    # Get recent entries (last 20)
-    cursor.execute("SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT 20")
-    rows = cursor.fetchall()
-    
-    conn.close()
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Count total entries
+        cursor.execute("SELECT COUNT(*) FROM audit_log")
+        total = cursor.fetchone()[0]
+        
+        # Get recent entries (last 20)
+        cursor.execute("SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT 20")
+        rows = cursor.fetchall()
+        
+        conn.close()
+    except sqlite3.Error as e:
+        st.error(f"Could not read audit log database.")
+        return
     
     st.write(f"Total audit entries: {total}")
     
@@ -791,7 +794,9 @@ def page_audit_log():
         headers = ["Entry ID", "Action", "File ID", "Recipe ID", "Timestamp", "Rows Processed", "Rows Exported", "Notes"]
         
         for row in rows:
-            with st.expander(f"{row[1]} - {row[4].strftime('%Y-%m-%d %H:%M') if row[4] else 'N/A'}"):
+            # Safely format timestamp string (stored as ISO text, not datetime obj)
+            ts_display = str(row[4])[:16] if row[4] else "N/A"
+            with st.expander(f"{row[1]} - {ts_display}"):
                 cols = st.columns(len(headers))
                 for i, header in enumerate(headers):
                     cols[i].write(f"{header}: {row[i]}")
