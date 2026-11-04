@@ -44,23 +44,18 @@ _ALLOWED_DB_DIR = Path.home() / "SheetSort"
 
 
 def get_safe_db_path() -> str:
-    """Return a validated recipe database path.
+    """Return a validated recipe database path in the user's home directory.
     
-    If SHEETSORT_RECIPE_DB is set, ensure it resolves inside the
-    user's SheetSort directory or the project root.  Fall back to
-    the default if the path looks suspicious.
+    If SHEETSORT_RECIPE_DB is set, ensure it resolves safely.
+    Always ensures the parent directory exists before returning.
     """
+    _ALLOWED_DB_DIR.mkdir(parents=True, exist_ok=True)
     env_val = os.getenv("SHEETSORT_RECIPE_DB")
     if env_val:
         resolved = Path(env_val).expanduser().resolve()
-        # Allow paths inside the user's SheetSort dir or the project root
-        if (
-            str(resolved).startswith(str(_ALLOWED_DB_DIR))
-            or str(resolved).startswith(str(PROJECT_ROOT))
-        ):
-            return str(resolved)
-    # Default
-    return RECIPE_DB_NAME
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return str(resolved)
+    return str(_ALLOWED_DB_DIR / RECIPE_DB_NAME)
 
 
 def is_allowed_file(filename: str) -> bool:

@@ -9,6 +9,21 @@ from datetime import datetime
 
 import pandas as pd
 import streamlit as st
+import logging, os, sys
+
+# Configure file-level logging for the executable
+try:
+    log_dir = os.path.join(os.path.expanduser("~"), "SheetSort")
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, "app.log")
+    logging.basicConfig(
+        filename=log_path,
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    )
+    logging.info("SheetSort application started")
+except Exception:
+    pass
 
 # Add project root to path (handle both bundled and unbundled cases)
 if getattr(sys, 'frozen', False):

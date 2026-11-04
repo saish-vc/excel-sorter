@@ -46,3 +46,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Institutional Sales Pitch & Demo Script (`docs/COLLEGE_SALES_PITCH.md`).
   - Administrative Staff User Manual (`docs/USER_GUIDE.md`).
   - Security Policy (`SECURITY.md`) and Contributing Guidelines (`CONTRIBUTING.md`).
+

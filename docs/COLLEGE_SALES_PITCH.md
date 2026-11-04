@@ -111,3 +111,4 @@ When pitching to college authorities, follow this scripted demonstration using t
 - **Target:** Whole College (Exam Cell, T&P Cell, Admissions, All Academic Departments, Principal Office).
 - **Includes:** Unlimited PC installations across the campus network, unlimited custom recipes, full staff training workshop, priority support, and audit log compliance reporting.
 - **Price:** **₹25,000 – ₹40,000** (One-time perpetual) + optional ₹5,000/year annual maintenance & updates.
+

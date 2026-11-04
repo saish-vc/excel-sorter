@@ -56,3 +56,4 @@ If you discover a security vulnerability within SheetSort, please report it resp
    - Steps or proof-of-concept (PoC) file to reproduce
    - Potential impact
 4. You will receive an acknowledgment within **48 hours**, followed by a triage assessment and remediation timeline.
+

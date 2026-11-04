@@ -21,3 +21,4 @@ Describe any alternative solutions or manual workarounds currently in use.
 - [ ] Attendance & Academic Section
 - [ ] Admissions Office
 - [ ] Other: _________
+

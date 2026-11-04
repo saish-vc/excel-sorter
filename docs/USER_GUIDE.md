@@ -102,3 +102,4 @@ Click **Apply Cleaning Operations** to transform the table instantly.
 ## 9. Audit Log
 - Every action (upload, recipe run, export) is recorded with timestamps, file identifiers, and row counts in the local database.
 - Provides compliance verification for university inspections (NAAC, NBA, NIRF audits).
+
